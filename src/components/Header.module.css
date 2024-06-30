@@ -1,0 +1,21 @@
+
+.headerWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 64px;
+    background-color: var(--lightSecondaryBGColor);
+    position: fixed;
+    width: -webkit-fill-available;
+    z-index: 2;
+    .logo {
+        font-family: 'Montserrat SemiBold';
+        font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .headerWrapper {
+        padding: 1rem 8px;
+    }
+}

@@ -1,0 +1,9 @@
+.primaryMediumButton {
+    width: 150px;
+    height: 50px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--lightPrimayBGColor);
+    color: var(--lightPrimaryFontColor);
+    font-family: 'Montserrat SemiBold';
+}
