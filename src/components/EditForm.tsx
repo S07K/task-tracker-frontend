@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleEditModal } from "../redux/eventActions";
 import { HexColorPicker } from "react-colorful";
 import axios from "axios";
-axios.defaults.baseURL = import.meta.env.VITE_API_URL
+axios.defaults.baseURL = import.meta.env.VITE_EVENTS_API_URL
 
 const EditForm: React.FC<any> = ({ event, onEventAdd }: any) => {
   const dispatch = useDispatch();

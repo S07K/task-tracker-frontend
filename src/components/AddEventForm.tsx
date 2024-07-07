@@ -18,7 +18,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCreateModal } from "../redux/eventActions";
 import axios from "axios";
-axios.defaults.baseURL = import.meta.env.VITE_API_URL
+axios.defaults.baseURL = import.meta.env.VITE_EVENTS_API_URL
 
 
 const AddEventForm: React.FC<any> = ({ event, onEventAdd }: any) => {

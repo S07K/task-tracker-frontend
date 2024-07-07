@@ -8,15 +8,27 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+axios.defaults.baseURL = import.meta.env.VITE_USER_API_URL;
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // Handle user registration logic here
-    console.log("Registering user:", username);
-    console.log("Password:", password);
+    console.log("Registering user Name:", name);
+    console.log("Registering user Email:", email);
+    console.log("Registering user Password:", password);
+    const res: any = await axios.post("/registerUser", {
+      name,
+      email,
+      password
+    });
+    console.log("Regiter User Response", res.data);
+    // if (res.data && res.data.events) {
+    // }
   };
 
   return (
@@ -63,12 +75,20 @@ const Register: React.FC = () => {
           <Box fontSize="xl" fontWeight="bold" pt={4} pb={4}>
             Register
           </Box>
+          <FormControl id="name" pb={4}>
+            <FormLabel>Name</FormLabel>
+            <Input
+              type="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </FormControl>
           <FormControl id="email" pb={4}>
-            <FormLabel>Email or Username</FormLabel>
+            <FormLabel>Email</FormLabel>
             <Input
               type="email"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
           <FormControl id="password" pb={4}>

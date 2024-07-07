@@ -8,12 +8,14 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+axios.defaults.baseURL = import.meta.env.VITE_USER_API_URL;
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Add your login logic here
   };
 
@@ -63,7 +65,7 @@ const Login: React.FC = () => {
             Login
           </Box>
           <FormControl id="email" pb={4}>
-            <FormLabel>Email or Username</FormLabel>
+            <FormLabel>Email</FormLabel>
             <Input
               type="email"
               value={email}
