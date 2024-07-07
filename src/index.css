@@ -31,24 +31,25 @@
   font-family: 'Montserrat Regular', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
+  
   color-scheme: light dark;
-  color: #ffffffde;
-  background-color: #242424;
+  color: #fff;
+  background-color: var(--theme-color);
   
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --fc-today-bg-color: #ac982e;
-  --theme-color: #3f6081;
-  --theme-color-secondary: #294561;
+  --fc-today-bg-color: #329f99;
+  --theme-color: #efefef;
+  --theme-color-secondary: #1E1E1E;
   --lightPrimayBGColor: #FFFFFF;
   --lightPrimaryFontColor: #1E1E1E;
-  --lightSecondaryBGColor:  #1E1E1E;
+  --lightSecondaryBGColor:  #333;
 }
-
+html {
+}
 body {
   margin: 0 !important;
   height: 100vh;
@@ -64,6 +65,32 @@ table {
 }
 .fc .fc-timegrid-axis-cushion {
   max-width: 62px;
+}
+.react-colorful__saturation {
+  height: 150px;
+}
+#error-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  h1 {
+    font-size: 2rem;
+    margin: 0;
+    font-family: 'Montserrat SemiBold', sans-serif;
+    padding-bottom: 10px;
+  }
+  span {
+    font-size: 1rem;
+    margin: 0;
+    font-family: 'Montserrat Regular', sans-serif;
+    color: var(--theme-color-secondary);
+  }
+  #error-note {
+    font-size: 1rem;
+    padding-top: 10px;
+  }
 }
 
 @media screen and (max-width: 600px) {

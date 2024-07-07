@@ -15,6 +15,7 @@
     color: var(--lightPrimaryFontColor);
 }
 .dayHeader {
+    color: var(--lightPrimayBGColor);
     background-color: var(--theme-color-secondary);
 }
 @media screen and (max-width: 768px) {

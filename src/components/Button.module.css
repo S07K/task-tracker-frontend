@@ -6,4 +6,7 @@
     background-color: var(--lightPrimayBGColor);
     color: var(--lightPrimaryFontColor);
     font-family: 'Montserrat SemiBold';
+    &:hover {
+        cursor: pointer;
+    }
 }

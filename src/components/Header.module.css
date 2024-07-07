@@ -4,11 +4,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 64px;
-    background-color: var(--lightSecondaryBGColor);
+    background-color: var(--lightPrimaryFontColor);
     position: fixed;
     width: -webkit-fill-available;
     z-index: 2;
     .logo {
+        color: var(--lightPrimayBGColor);
         font-family: 'Montserrat SemiBold';
         font-size: 24px;
     }
