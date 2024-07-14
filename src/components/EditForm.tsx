@@ -35,7 +35,6 @@ const EditForm: React.FC<any> = ({ event, onEventAdd }: any) => {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const handleEditCancel = () => {
-    console.log("Clicked edit button");
     dispatch(toggleEditModal(false));
   };
   const openDeleteConfirmDialog = () => {
@@ -71,21 +70,19 @@ const EditForm: React.FC<any> = ({ event, onEventAdd }: any) => {
       backgroundColor: color,
       url: '',
     }
-    // console.log("Clicked edit save button: ", publicId, payload);
     try {
       setIsSaving(true);
       const res: any = await axios.patch(`/updateEvent/${publicId}`, payload)
       if(res.data && res.data.event){
-        console.log('Event Updated', res.data.event)
         setIsSaving(false);
         dispatch(toggleEditModal(false));
         onEventAdd();
       } else if(res.data && res.data.error){
-        console.log('Error Updating event', res.data.error)
+        console.error('Error Updating event', res.data.error)
         setIsSaving(false);
       }
     } catch (error) {
-      console.log('Error Updating event', error)
+      console.error('Error Updating event', error)
       setIsSaving(false);
     }
   };
@@ -94,23 +91,21 @@ const EditForm: React.FC<any> = ({ event, onEventAdd }: any) => {
       setIsDeleting(true);
       const res: any = await axios.delete(`/deleteEvent/${publicId}`)
       if(res.data && res.data.events){
-        console.log('Event Deleted', res.data.events)
         setIsDeleting(false);
         setIsConfirmDialogOpen(false);
         dispatch(toggleEditModal(false));
         onEventAdd();
       } else if(res.data && res.data.error){
-        console.log('Error Updating event', res.data.error)
+        console.error('Error Updating event', res.data.error)
         setIsDeleting(false);
       }
     } catch (error) {
-      console.log('Error Updating event', error)
+      console.error('Error Updating event', error)
       setIsDeleting(false);
     }
   };
 
   useEffect(() => {
-    console.log("Edit ", event);
     setPublicId(event.id);
     setColor(event.backgroundColor);
     setTitle(event.title);

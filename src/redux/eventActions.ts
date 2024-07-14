@@ -1,9 +1,11 @@
 import {
-    CREATE_MODAL_STATE,
-    EDIT_MODAL_STATE,
-    FETCH_EVENTS_FAILURE,
-    FETCH_EVENTS_REQUEST,
-    FETCH_EVENTS_SUCCESS,
+  CREATE_MODAL_STATE,
+  EDIT_MODAL_STATE,
+  FETCH_EVENTS_FAILURE,
+  FETCH_EVENTS_REQUEST,
+  FETCH_EVENTS_SUCCESS,
+  TOKEN_STATE,
+  USER_STATE,
 } from "./eventTypes";
 
 export function fetchEventRequest() {
@@ -35,5 +37,34 @@ export function toggleCreateModal(event: any) {
     payload: event,
   };
 }
+export function setToken(event: any) {
+  if (event) {
+    localStorage.setItem("token", event);
+  } else {
+    localStorage.removeItem("token");
+  }
+  return {
+    type: TOKEN_STATE,
+    payload: event,
+  };
+}
 
-  
+export function setUser(event: any) {
+  if (event) {
+    localStorage.setItem("id", event);
+  } else {
+    localStorage.removeItem("id");
+  }
+  return {
+    type: USER_STATE,
+    payload: event,
+  };
+}
+
+export function logOut(): any {
+  return (dispatch: any) => {
+    dispatch(setToken(""));
+    dispatch(setUser(""));
+    window.location.reload();
+  };
+}

@@ -69,29 +69,6 @@ table {
 .react-colorful__saturation {
   height: 150px;
 }
-#error-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  h1 {
-    font-size: 2rem;
-    margin: 0;
-    font-family: 'Montserrat SemiBold', sans-serif;
-    padding-bottom: 10px;
-  }
-  span {
-    font-size: 1rem;
-    margin: 0;
-    font-family: 'Montserrat Regular', sans-serif;
-    color: var(--theme-color-secondary);
-  }
-  #error-note {
-    font-size: 1rem;
-    padding-top: 10px;
-  }
-}
 
 @media screen and (max-width: 600px) {
   .fc-header-toolbar {

@@ -5,14 +5,12 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import style from "./CalendarContainer.module.css";
 import axios from "axios";
-axios.defaults.baseURL = import.meta.env.VITE_EVENTS_API_URL;
 import EditForm from "./EditForm";
 import AddEventForm from "./AddEventForm";
-import { useDispatch } from "react-redux";
-import { toggleCreateModal, toggleEditModal } from "../redux/eventActions";
+import { useDispatch, useSelector } from "react-redux";
+import { logOut, toggleCreateModal, toggleEditModal } from "../redux/eventActions";
 
 function splitDateAndTime(dateString: string): { date: string; time: string } {
-  console.log("Date String", dateString);
   if (!dateString) return { date: "", time: "" };
   const arr = dateString.split("T");
   return {
@@ -37,10 +35,14 @@ function convertToHHMM(timeString: string) {
 }
 
 const CalendarContainer: React.FC = () => {
+  const {userId, token} = useSelector((state: any) => state.event);
+  axios.defaults.baseURL = import.meta.env.VITE_EVENTS_API_URL;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   const [currentEditEvent, setCurrentEditEvent] = useState({});
   const [currentEvents, setCurrentEvents] = useState<any[]>([]);
   const [selectedDates, setSelectedDates] = useState<any>({});
   const dispatch = useDispatch();
+
 
   const formatEvents = (events: any) => {
     const formattedEvents = events.map((event: any) => {
@@ -68,20 +70,24 @@ const CalendarContainer: React.FC = () => {
 
   const fetchEvents = async () => {
     const res: any = await axios.get("/getAllEvents");
+    if(res.data && res.data.isInvalidToken) {
+      dispatch(logOut())
+    }
     if (res.data && res.data.events) {
-      console.log("Events fetched", res.data.events);
       setCurrentEvents(res.data.events);
+    } else {
+      console.error("Error fetching events");
     }
   };
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if(userId) {
+      fetchEvents();
+    }
+  }, [userId]);
 
   function handleDateSelect(selectInfo: any) {
     dispatch(toggleCreateModal(true));
-    console.log("Selected Dates", selectInfo);
     const formattedEvent = formatSingleEvent([selectInfo], true);
-    console.log("Formatted Event", formattedEvent);
     setSelectedDates(formattedEvent[0]);
   }
 
@@ -89,35 +95,35 @@ const CalendarContainer: React.FC = () => {
     if (publicId) {
       try {
         const res: any = await axios.get(`/searchEvent/${publicId}`);
+        if(res.data && res.data.isInvalidToken) {
+          dispatch(logOut())
+        }
+
         if (res.data && res.data.event) {
-          console.log("Event fetched", res.data.event);
           return res.data.event;
         } else if (res.data && res.data.error) {
-          console.log("Error fetching event details", res.data.error);
+          console.error("Error fetching event details", res.data.error);
         } else {
-          console.log("Error fetching event details");
+          console.error("Error fetching event details");
         }
       } catch (error) {
-        console.log("Error fetching event details", error);
+        console.error("Error fetching event details", error);
       }
     }
   }
 
   async function handleEventClick(clickInfo: any) {
-    console.log(clickInfo.event._def);
     dispatch(toggleEditModal(true));
     const event = await fetchSingleEvent(clickInfo.event._def.publicId);
     const formattedEvent = formatSingleEvent([event], false);
-    console.log("Edit Event", formattedEvent);
     setCurrentEditEvent(formattedEvent[0]);
   }
 
   function handleEvents(events: any) {
-    console.log("Events updated", events);
+    // console.log("Events updated", events);
   }
 
   function renderEventContent(eventInfo: any) {
-    console.log("Event Info", eventInfo);
     const event = eventInfo.event._def
     const publicId = event.publicId;
     const allDay = event.allDay;
@@ -128,9 +134,7 @@ const CalendarContainer: React.FC = () => {
     } else {
       currentEvents.forEach((element) => {
         if (element.id === publicId) {
-          // console.log("Element", element);
           formattedEvent = formatEvents([element])[0]
-          console.log("Formatted Event", formattedEvent);
         }
       });
     }

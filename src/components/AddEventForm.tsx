@@ -18,10 +18,10 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCreateModal } from "../redux/eventActions";
 import axios from "axios";
-axios.defaults.baseURL = import.meta.env.VITE_EVENTS_API_URL
 
 
 const AddEventForm: React.FC<any> = ({ event, onEventAdd }: any) => {
+  axios.defaults.baseURL = import.meta.env.VITE_EVENTS_API_URL;
   const dispatch = useDispatch();
   const [color, setColor] = useState('#333');
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -30,39 +30,42 @@ const AddEventForm: React.FC<any> = ({ event, onEventAdd }: any) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const { isCreateModalOpen } = useSelector((state: any) => state.event);
+  const {isCreateModalOpen, userId} = useSelector((state: any) => state.event);
 
   const handleSaveCancel = () => {
-    console.log("Clicked cancel save button");
     dispatch(toggleCreateModal(false));
   };
 
   const SaveEvent = async () => {
-    const payload = {
-      title: title,
-      allDay: allDay,
-      startStr: startDate.split('T')[0],
-      endStr: endDate.split('T')[0],
-      start: startDate,
-      end: endDate,
-      backgroundColor: color,
-      url: '',
-    }
-    // console.log("Clicked save button", payload);
-    try {
-      setIsSaving(true);
-      const res: any = await axios.post('/addEvent', payload)
-      if(res.data && res.data.event){
-        console.log('Event added', res.data.event)
-        setIsSaving(false);
-        dispatch(toggleCreateModal(false));
-        onEventAdd();
-      } else if(res.data && res.data.error){
-        console.log('Error creating event', res.data.error)
+    setIsSaving(true);
+    if(title && ((startDate && endDate) || allDay) && userId) {
+      const payload = {
+        id: userId,
+        title: title,
+        allDay: allDay,
+        startStr: startDate ? startDate.split('T')[0] : '',
+        endStr: endDate ? endDate.split('T')[0] : '',
+        start: startDate ? startDate : '',
+        end: endDate ? endDate : '',
+        backgroundColor: color,
+        url: '',
+      }
+      try {
+        const res: any = await axios.post('/addEvent', payload)
+        if(res.data && res.data.event){
+          setIsSaving(false);
+          dispatch(toggleCreateModal(false));
+          onEventAdd();
+        } else if(res.data && res.data.error){
+          console.error('Error creating event', res.data.error)
+          setIsSaving(false);
+        }
+      } catch (error) {
+        console.error('Error creating event', error)
         setIsSaving(false);
       }
-    } catch (error) {
-      console.log('Error creating event', error)
+    } else {
+      console.error('Error creating event')
       setIsSaving(false);
     }
   };
@@ -82,7 +85,6 @@ const AddEventForm: React.FC<any> = ({ event, onEventAdd }: any) => {
     setEndDate(event.target.value);
   };
   useEffect(() => {
-    console.log("Add: ", event);
     if (event) {
       setStartDate(event.startStr + `T00:00`);
       setEndDate(event.endStr + `T00:00`);

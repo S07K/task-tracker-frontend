@@ -4,6 +4,8 @@ import {
     FETCH_EVENTS_SUCCESS,
     EDIT_MODAL_STATE,
     CREATE_MODAL_STATE,
+    TOKEN_STATE,
+    USER_STATE,
   } from "./eventTypes";
   
   const initialState = {
@@ -12,6 +14,8 @@ import {
     loading: false,
     events: [],
     error: "",
+    token: "",
+    userId: "",
   };
   
   const userReducer = (state = initialState, action: any) => {
@@ -19,13 +23,17 @@ import {
       case FETCH_EVENTS_REQUEST:
         return { ...state, loading: true };
       case FETCH_EVENTS_FAILURE:
-        return { loading: false, error: action.payload, events: [] };
+        return { ...state, loading: false, error: action.payload, events: [] };
       case FETCH_EVENTS_SUCCESS:
-        return { loading: false, error: "", events: action.payload };
+        return { ...state, loading: false, error: "", events: action.payload };
       case EDIT_MODAL_STATE:
-        return { isEditModalOpen: action.payload };
+        return { ...state, isEditModalOpen: action.payload };
       case CREATE_MODAL_STATE:
-        return { isCreateModalOpen: action.payload };
+        return { ...state, isCreateModalOpen: action.payload };
+      case TOKEN_STATE:
+        return { ...state, token: action.payload };
+      case USER_STATE:
+        return { ...state, userId: action.payload };
       default:
         return state;
     }

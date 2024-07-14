@@ -1,17 +1,10 @@
 import React from "react";
-import { ChakraProvider, background, extendTheme } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import App from "./App.tsx";
-import ErrorPage from "./error-page.tsx";
 import "./index.css";
 import { Provider } from "react-redux";
 import store from "./redux/store.ts";
-import Login from "./Login.tsx";
-import Register from "./Register.tsx";
+import AppRouter from "./AppRouter.tsx";
 
 const theme = extendTheme({
   fonts: {
@@ -27,39 +20,11 @@ const theme = extendTheme({
   },
 });
 
-const router = createBrowserRouter([
-  {
-    path: "/login",
-    element: <Login />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ErrorPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/home",
-    element: <App />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/*",
-    element: <ErrorPage />,
-    errorElement: <ErrorPage />,
-  }
-]);
-
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
       <Provider store={store}>
-        <RouterProvider router={router} />
+        <AppRouter />
       </Provider>
     </ChakraProvider>
   </React.StrictMode>
