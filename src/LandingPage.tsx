@@ -4,6 +4,8 @@ import { Box, Text } from "@chakra-ui/react";
 import style from "./LandingPage.module.css";
 import { motion, Variants } from "framer-motion";
 import { Link } from "react-router-dom";
+import eventSchedule from "./assets/images/eventSchedule.png";
+import centerCalendar from "./assets/images/centerCalendar.png";
 
 const LandingPage: React.FC = () => {
   const animVariants: Variants = {
@@ -39,7 +41,7 @@ const LandingPage: React.FC = () => {
             </div>
             <div className={style.imageWrapper}>
               <img
-                src="src/assets/images/eventSchedule.png"
+                src={eventSchedule}
                 alt="landing page"
                 className={style.image}
               />
@@ -50,7 +52,7 @@ const LandingPage: React.FC = () => {
         <section className={style.section2}>
           <div className={style.imageWrapper}>
             <img
-              src="src/assets/images/centerCalendar.png"
+              src={centerCalendar}
               alt="landing page"
               className={style.image}
             />
