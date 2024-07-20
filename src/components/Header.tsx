@@ -19,9 +19,7 @@ import { Link } from "react-router-dom";
 
 const Header: React.FC = () => {
   const dispatch = useDispatch();
-  const {isCreateModalOpen, token} = useSelector(
-    (state: any) => state.event
-  );
+  const { isCreateModalOpen, token } = useSelector((state: any) => state.event);
   const openAddEventForm = () => {
     if (!isCreateModalOpen) {
       dispatch(toggleCreateModal(true));
@@ -29,15 +27,16 @@ const Header: React.FC = () => {
   };
 
   const logOut = () => {
-    dispatch(setToken(""))
-    dispatch(setUser(""))
-    window.location.reload()
-  }
+    dispatch(setToken(""));
+    dispatch(setUser(""));
+    window.location.reload();
+  };
   return (
     <header className={style.headerWrapper}>
-      <span className={style.logo}><Link to={"/home"}>Task Tracker</Link></span>
-      {
-        token ? 
+      <span className={style.logo}>
+        <Link to={"/home"}>Task Tracker</Link>
+      </span>
+      {token ? (
         <Box className={style.rightSection}>
           <Button
             variant="brandPrimary"
@@ -51,7 +50,7 @@ const Header: React.FC = () => {
               <WrapItem>
                 <Avatar
                   bg={"#333"}
-                  icon={<AiOutlineUser fontSize='1.5rem' />}
+                  icon={<AiOutlineUser fontSize="1.5rem" />}
                   src=""
                 />
               </WrapItem>
@@ -59,7 +58,13 @@ const Header: React.FC = () => {
             <MenuList>
               <MenuGroup title="Profile">
                 <MenuItem>My Account</MenuItem>
-                <MenuItem color={"#e54e4e"} _hover={{backgroundColor: "#e54e4e", color: "#fff"}} onClick={logOut}>Log out</MenuItem>
+                <MenuItem
+                  color={"#e54e4e"}
+                  _hover={{ backgroundColor: "#e54e4e", color: "#fff" }}
+                  onClick={logOut}
+                >
+                  Log out
+                </MenuItem>
               </MenuGroup>
               {/* <MenuDivider /> */}
               {/* <MenuGroup title="Help">
@@ -68,22 +73,27 @@ const Header: React.FC = () => {
                       </MenuGroup> */}
             </MenuList>
           </Menu>
-        </Box> : 
+        </Box>
+      ) : (
         <Box className={style.rightSection}>
-        <Button
-          variant="brandPrimary"
-          className={ButtonStyle.primaryMediumButton}
-        >
-          <Link to={"/register"}>Register</Link>
-        </Button>
-        <Button
-          variant="brandPrimary"
-          className={ButtonStyle.primaryMediumButton}
-        >
-          <Link to={"/login"}>Login</Link>
-        </Button>
-      </Box>
-      }
+          <Link to={"/register"}>
+            <Button
+              variant="brandPrimary"
+              className={ButtonStyle.primaryMediumButton}
+            >
+              Register
+            </Button>
+          </Link>
+          <Link to={"/login"}>
+            <Button
+              variant="brandPrimary"
+              className={ButtonStyle.primaryMediumButton}
+            >
+              Login
+            </Button>
+          </Link>
+        </Box>
+      )}
     </header>
   );
 };
