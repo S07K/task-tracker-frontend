@@ -7,12 +7,12 @@ import {
   VStack,
   FormHelperText,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { setToken, setUser } from "./redux/eventActions";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 axios.defaults.baseURL = import.meta.env.VITE_USER_API_URL;
 
 const Login: React.FC = () => {

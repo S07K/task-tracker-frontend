@@ -119,9 +119,9 @@ const CalendarContainer: React.FC = () => {
     setCurrentEditEvent(formattedEvent[0]);
   }
 
-  function handleEvents(events: any) {
-    // console.log("Events updated", events);
-  }
+  // function handleEvents(events: any) {
+  //   console.log("Events updated", events);
+  // }
 
   function renderEventContent(eventInfo: any) {
     const event = eventInfo.event._def
@@ -178,7 +178,7 @@ const CalendarContainer: React.FC = () => {
           select={handleDateSelect}
           eventContent={renderEventContent} // custom render function
           eventClick={handleEventClick}
-          eventsSet={handleEvents} // called after events are initialized/added/changed/removed
+          // eventsSet={handleEvents} // called after events are initialized/added/changed/removed
           // you can update a remote database when these fire:
           // eventAdd={function(){}}
           // eventChange={function(){

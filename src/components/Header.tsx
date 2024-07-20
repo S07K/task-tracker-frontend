@@ -9,7 +9,6 @@ import {
   Button,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuGroup,
   MenuItem,
   MenuList,
