@@ -6,6 +6,7 @@ import Login from "./Login.tsx";
 import Register from "./Register.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "./redux/eventActions.ts";
+import LandingPage from "./LandingPage.tsx";
 
 const AppRouter: React.FC = () => {
   const token = useSelector((state: any) => state.event.token) || localStorage.getItem("token");
@@ -27,7 +28,7 @@ const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={token ? <Navigate to={"/home"} /> : <Navigate to={"/login"} /> } />
+        <Route path="/" element={token ? <Navigate to={"/home"} /> : <LandingPage /> } />
         <Route path="/login" element={token ? <Navigate to={"/home"} /> : <Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={token ? <App /> : <Navigate to={"/login"} />} />

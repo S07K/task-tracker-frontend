@@ -20,8 +20,8 @@ import { Link } from "react-router-dom";
 
 const Header: React.FC = () => {
   const dispatch = useDispatch();
-  const isCreateModalOpen = useSelector(
-    (state: any) => state.event.isCreateModalOpen
+  const {isCreateModalOpen, token} = useSelector(
+    (state: any) => state.event
   );
   const openAddEventForm = () => {
     if (!isCreateModalOpen) {
@@ -37,37 +37,54 @@ const Header: React.FC = () => {
   return (
     <header className={style.headerWrapper}>
       <span className={style.logo}><Link to={"/home"}>Task Tracker</Link></span>
-      <Box className={style.rightSection}>
+      {
+        token ? 
+        <Box className={style.rightSection}>
+          <Button
+            variant="brandPrimary"
+            onClick={openAddEventForm}
+            className={ButtonStyle.primaryMediumButton}
+          >
+            Create Task
+          </Button>
+          <Menu>
+            <MenuButton>
+              <WrapItem>
+                <Avatar
+                  bg={"#333"}
+                  icon={<AiOutlineUser fontSize='1.5rem' />}
+                  src=""
+                />
+              </WrapItem>
+            </MenuButton>
+            <MenuList>
+              <MenuGroup title="Profile">
+                <MenuItem>My Account</MenuItem>
+                <MenuItem color={"#e54e4e"} _hover={{backgroundColor: "#e54e4e", color: "#fff"}} onClick={logOut}>Log out</MenuItem>
+              </MenuGroup>
+              {/* <MenuDivider /> */}
+              {/* <MenuGroup title="Help">
+                          <MenuItem>Docs</MenuItem>
+                          <MenuItem>FAQ</MenuItem>
+                      </MenuGroup> */}
+            </MenuList>
+          </Menu>
+        </Box> : 
+        <Box className={style.rightSection}>
         <Button
           variant="brandPrimary"
-          onClick={openAddEventForm}
           className={ButtonStyle.primaryMediumButton}
         >
-          Create Task
+          <Link to={"/register"}>Register</Link>
         </Button>
-        <Menu>
-          <MenuButton>
-            <WrapItem>
-              <Avatar
-                bg={"#333"}
-                icon={<AiOutlineUser fontSize='1.5rem' />}
-                src=""
-              />
-            </WrapItem>
-          </MenuButton>
-          <MenuList>
-            <MenuGroup title="Profile">
-              <MenuItem>My Account</MenuItem>
-              <MenuItem color={"#e54e4e"} _hover={{backgroundColor: "#e54e4e", color: "#fff"}} onClick={logOut}>Log out</MenuItem>
-            </MenuGroup>
-            {/* <MenuDivider /> */}
-            {/* <MenuGroup title="Help">
-                        <MenuItem>Docs</MenuItem>
-                        <MenuItem>FAQ</MenuItem>
-                    </MenuGroup> */}
-          </MenuList>
-        </Menu>
+        <Button
+          variant="brandPrimary"
+          className={ButtonStyle.primaryMediumButton}
+        >
+          <Link to={"/login"}>Login</Link>
+        </Button>
       </Box>
+      }
     </header>
   );
 };

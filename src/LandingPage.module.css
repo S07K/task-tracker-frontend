@@ -1,0 +1,82 @@
+body {
+    height: auto;
+}
+.pageWrapper {
+    padding: calc(82px + 1rem) 64px 0 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+    .section {
+        display: flex;
+        padding: 60px;
+        background: #FCF39F;
+        box-shadow: 0 1px 16px 0 #e7e7e75c;
+        border-radius: 50px;
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .smallTitle {
+                font-size: 32px;
+                font-family: 'Montserrat Bold';
+            }
+            .bigTitle {
+                padding-top: 40px;
+                font-size: 64px;
+                font-family: 'Montserrat Bold';
+                .highlight {
+                    color: #45824B;
+                }
+            }
+        }
+        .imageWrapper {
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    }
+    .section2 {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding-left: 40px;
+            width: 500px;
+            height: 500px;
+            background: #FCD79F;
+            box-shadow: 0 1px 16px 0 #e7e7e75c;
+            border-radius: 8px;
+            .bigTitle {
+                font-size: 32px;
+                font-family: 'Montserrat Bold';
+                .highlight {
+                    color: #fff;
+                }
+            }
+        }
+        .imageWrapper {
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    }
+}
+.footerWrapper {
+    background-color: var(--theme-color-secondary);
+    padding: 64px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--theme-color);
+    .bigTitle {
+        font-size: 96px;
+        font-family: 'Montserrat Bold';
+    }
+}

@@ -128,7 +128,7 @@ const Register: React.FC = () => {
             padding: "20px",
           }}
         >
-          Task Tracker
+          <Link to={"/"}>Task Tracker</Link>
         </Box>
         <Box
           width={"100%"}
