@@ -79,7 +79,7 @@ const Header: React.FC = () => {
           <Link to={"/register"}>
             <Button
               variant="brandPrimary"
-              className={ButtonStyle.primaryMediumButton}
+              className={ButtonStyle.SecondaryMediumButton}
             >
               Register
             </Button>

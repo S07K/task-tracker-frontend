@@ -10,3 +10,17 @@
         cursor: pointer;
     }
 }
+
+.SecondaryMediumButton {
+    width: 150px;
+    height: 50px;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    border: 1px solid var(--lightPrimayBGColor);
+    color: var(--lightPrimayBGColor);
+    font-family: 'Montserrat SemiBold';
+    &:hover {
+        cursor: pointer;
+    }
+}
