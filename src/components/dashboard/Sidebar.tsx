@@ -13,16 +13,18 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { IconType } from "react-icons";
-import { LuCalendarDays, LuListChecks, LuLogOut, LuUser } from "react-icons/lu";
+import { LuCalendarDays, LuListChecks, LuLogOut, LuSettings, LuUser } from "react-icons/lu";
 import Logo from "../Logo";
 import { logOut } from "../../redux/eventActions";
+import { Account } from "./context";
 
 const NAV_ITEMS: { label: string; to: string; icon: IconType; end?: boolean }[] = [
   { label: "Upcoming", to: "/home", icon: LuListChecks, end: true },
   { label: "Calendar", to: "/home/calendar", icon: LuCalendarDays },
+  { label: "Account", to: "/home/account", icon: LuSettings },
 ];
 
 const NavItem: React.FC<(typeof NAV_ITEMS)[number] & { compact?: boolean }> = ({
@@ -55,8 +57,9 @@ const NavItem: React.FC<(typeof NAV_ITEMS)[number] & { compact?: boolean }> = ({
   </NavLink>
 );
 
-const UserMenu: React.FC<{ compact?: boolean }> = ({ compact }) => {
+const UserMenu: React.FC<{ account: Account | null; compact?: boolean }> = ({ account, compact }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   return (
     <Menu placement={compact ? "bottom-end" : "top-start"}>
       <MenuButton
@@ -68,16 +71,29 @@ const UserMenu: React.FC<{ compact?: boolean }> = ({ compact }) => {
         textAlign="left"
       >
         <HStack spacing={2.5}>
-          <Avatar size="xs" bg="gray.900" color="white" icon={<LuUser />} />
+          <Avatar size="xs" bg="gray.900" color="white" name={account?.name} icon={<LuUser />} />
           {!compact && (
-            <Text fontSize="sm" fontWeight={500} color="gray.700">
-              My account
+            <Text fontSize="sm" fontWeight={500} color="gray.700" noOfLines={1}>
+              {account?.name || "My account"}
             </Text>
           )}
         </HStack>
       </MenuButton>
-      <MenuList minW="180px">
-        <MenuItem icon={<LuUser />}>My account</MenuItem>
+      <MenuList minW="200px">
+        {account && (
+          <Box px={3} py={2}>
+            <Text fontSize="sm" fontWeight={600} noOfLines={1}>
+              {account.name}
+            </Text>
+            <Text fontSize="xs" color="gray.500" noOfLines={1}>
+              {account.email}
+            </Text>
+          </Box>
+        )}
+        {account && <MenuDivider borderColor="gray.200" my={1} />}
+        <MenuItem icon={<LuSettings />} onClick={() => navigate("/home/account")}>
+          Account settings
+        </MenuItem>
         <MenuDivider borderColor="gray.200" my={1} />
         <MenuItem icon={<LuLogOut />} color="red.600" onClick={() => dispatch(logOut())}>
           Log out
@@ -88,7 +104,7 @@ const UserMenu: React.FC<{ compact?: boolean }> = ({ compact }) => {
 };
 
 /** Desktop sidebar + mobile top bar / bottom tab bar. */
-const Sidebar: React.FC = () => (
+const Sidebar: React.FC<{ account: Account | null }> = ({ account }) => (
   <>
     <Box
       as="aside"
@@ -113,7 +129,7 @@ const Sidebar: React.FC = () => (
           <NavItem key={item.to} {...item} />
         ))}
       </VStack>
-      <UserMenu />
+      <UserMenu account={account} />
     </Box>
 
     <Flex
@@ -130,7 +146,7 @@ const Sidebar: React.FC = () => (
       borderColor="gray.200"
     >
       <Logo to="/home" size="sm" />
-      <UserMenu compact />
+      <UserMenu account={account} compact />
     </Flex>
 
     <Flex

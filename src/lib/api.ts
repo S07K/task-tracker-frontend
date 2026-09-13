@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { InternalAxiosRequestConfig } from "axios";
 
 // Separate clients so the users and events APIs never clobber each other's baseURL.
 export const usersApi = axios.create({
@@ -9,10 +9,13 @@ export const eventsApi = axios.create({
   baseURL: import.meta.env.VITE_EVENTS_API_URL,
 });
 
-eventsApi.interceptors.request.use((config) => {
+const withAuth = (config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-});
+};
+
+eventsApi.interceptors.request.use(withAuth);
+usersApi.interceptors.request.use(withAuth);
