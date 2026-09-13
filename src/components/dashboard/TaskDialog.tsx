@@ -38,6 +38,8 @@ import {
   toDateTimeInput,
 } from "../../lib/date";
 import { TaskDraft } from "./context";
+import DatePicker from "../ui/DatePicker";
+import TimePicker from "../ui/TimePicker";
 
 export type TaskDialogState =
   | { mode: "create"; draft?: TaskDraft }
@@ -189,6 +191,69 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ state, onClose, onSaved }) => {
 
   const isCustomColor = !TASK_COLORS.includes(color);
 
+  const [startDay = "", startTime = ""] = startDateTime.split("T");
+  const [endDay = "", endTime = ""] = endDateTime.split("T");
+
+  // Moving the start keeps the task's duration, like most calendar apps.
+  const updateStart = (day: string, time: string) => {
+    const next = `${day}T${time}`;
+    const prevStart = parseLocal(startDateTime);
+    const prevEnd = parseLocal(endDateTime);
+    const nextStart = parseLocal(next);
+    const duration = prevStart && prevEnd && prevEnd > prevStart ? prevEnd.getTime() - prevStart.getTime() : 30 * 60000;
+    setStartDateTime(next);
+    if (nextStart) setEndDateTime(toDateTimeInput(new Date(nextStart.getTime() + duration)));
+  };
+
+  /**
+   * Leaves all-day mode for a timed task. Reuses the previous times unless they were
+   * the midnight-to-midnight placeholders of an all-day range, in which case 9:00–9:30.
+   */
+  const exitAllDay = ({
+    day = startDate,
+    endDay: nextEndDay,
+    time,
+    endTime: nextEndTime,
+  }: {
+    day?: string;
+    endDay?: string;
+    time?: string;
+    endTime?: string;
+  }) => {
+    const prevStart = parseLocal(startDateTime);
+    const prevEnd = parseLocal(endDateTime);
+    const prevDuration = prevStart && prevEnd ? prevEnd.getTime() - prevStart.getTime() : 0;
+    const duration = prevDuration > 0 && prevDuration < 24 * 3600000 ? prevDuration : 30 * 60000;
+    const startClock = time ?? (startTime && startTime !== "00:00" ? startTime : "09:00");
+    const start = parseLocal(`${day}T${startClock}`);
+    if (!start) return;
+    let end = new Date(start.getTime() + duration);
+    if (nextEndDay) {
+      const endOnDay = parseLocal(`${nextEndDay}T${toDateTimeInput(end).split("T")[1]}`);
+      if (endOnDay && endOnDay > start) end = endOnDay;
+    }
+    if (nextEndTime) {
+      // End at the chosen time, rolling to the next day if it would be before the start.
+      const candidate = parseLocal(`${day}T${nextEndTime}`);
+      if (candidate) end = candidate > start ? candidate : addDays(candidate, 1);
+    }
+    setStartDateTime(toDateTimeInput(start));
+    setEndDateTime(toDateTimeInput(end));
+    setAllDay(false);
+  };
+
+  const toggleAllDay = () => {
+    if (allDay) {
+      exitAllDay({ day: startDate });
+      return;
+    }
+    setStartDate(startDay);
+    setEndDate(endDay && endDay >= startDay ? endDay : startDay);
+    setAllDay(true);
+  };
+
+  const rangeInvalid = submitted && Boolean(rangeError);
+
   return (
     <Modal isOpen={Boolean(state)} onClose={onClose} size="lg" isCentered>
       <ModalOverlay backdropFilter="blur(2px)" />
@@ -236,36 +301,56 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ state, onClose, onSaved }) => {
             <Switch
               colorScheme="gray"
               isChecked={allDay}
-              onChange={() => setAllDay((v) => !v)}
+              onChange={toggleAllDay}
               sx={{ "span.chakra-switch__track[data-checked]": { bg: "gray.900" } }}
             />
           </Flex>
 
           <FormControl isInvalid={submitted && Boolean(rangeError)} mb={5}>
-            <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={3}>
+            {/* Date + time are always shown; editing either while all-day is on switches to a timed task. */}
+            <SimpleGrid columns={1} spacing={3}>
               <Box>
-                <FormLabel>{allDay ? "Start date" : "Starts"}</FormLabel>
-                {allDay ? (
-                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                ) : (
-                  <Input
-                    type="datetime-local"
-                    value={startDateTime}
-                    onChange={(e) => setStartDateTime(e.target.value)}
-                  />
-                )}
+                <FormLabel>Starts</FormLabel>
+                <Flex gap={2}>
+                  <Box flex={1} minW={0}>
+                    <DatePicker
+                      aria-label="Start date"
+                      value={allDay ? startDate : startDay}
+                      onChange={(d) => (allDay ? exitAllDay({ day: d }) : updateStart(d, startTime))}
+                    />
+                  </Box>
+                  <Box w="130px" flexShrink={0}>
+                    <TimePicker
+                      aria-label="Start time"
+                      value={allDay ? "" : startTime}
+                      placeholder="All day"
+                      onChange={(t) => (allDay ? exitAllDay({ time: t }) : updateStart(startDay, t))}
+                    />
+                  </Box>
+                </Flex>
               </Box>
               <Box>
-                <FormLabel>{allDay ? "End date" : "Ends"}</FormLabel>
-                {allDay ? (
-                  <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                ) : (
-                  <Input
-                    type="datetime-local"
-                    value={endDateTime}
-                    onChange={(e) => setEndDateTime(e.target.value)}
-                  />
-                )}
+                <FormLabel>Ends</FormLabel>
+                <Flex gap={2}>
+                  <Box flex={1} minW={0}>
+                    <DatePicker
+                      aria-label="End date"
+                      value={allDay ? endDate : endDay}
+                      minDate={allDay ? startDate : startDay}
+                      onChange={(d) => (allDay ? exitAllDay({ endDay: d }) : setEndDateTime(`${d}T${endTime}`))}
+                      isInvalid={rangeInvalid}
+                    />
+                  </Box>
+                  <Box w="130px" flexShrink={0}>
+                    <TimePicker
+                      aria-label="End time"
+                      value={allDay ? "" : endTime}
+                      placeholder="All day"
+                      onChange={(t) => (allDay ? exitAllDay({ endTime: t }) : setEndDateTime(`${endDay}T${t}`))}
+                      isInvalid={rangeInvalid}
+                    />
+                  </Box>
+                </Flex>
               </Box>
             </SimpleGrid>
             <FormErrorMessage fontSize="xs">{rangeError}</FormErrorMessage>

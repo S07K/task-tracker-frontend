@@ -390,7 +390,7 @@ const LandingPage: React.FC = () => {
             <Logo size="sm" />
             <Text fontSize="sm" color="gray.500">
               Built by{" "}
-              <ChakraLink href="https://s07k.github.io/portfolio/" isExternal color="gray.900" fontWeight={500}>
+              <ChakraLink href="https://portfolio-indol-three-50.vercel.app/" isExternal color="gray.900" fontWeight={500}>
                 Shubham
               </ChakraLink>{" "}
               with 🤍
