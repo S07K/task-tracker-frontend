@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, ButtonGroup, Flex, HStack, IconButton, Text, useBreakpointValue, useToast } from "@chakra-ui/react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -85,6 +85,11 @@ const CalendarPage: React.FC = () => {
     setView(next);
     api()?.changeView(next);
   };
+
+  // Time grids get a fixed height after the view switch, so scroll once it has rendered.
+  useEffect(() => {
+    if (view !== "dayGridMonth") api()?.scrollToTime("08:00:00");
+  }, [view]);
 
   const handleSelect = (info: DateSelectArg) => {
     api()?.unselect();
