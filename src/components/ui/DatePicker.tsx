@@ -80,7 +80,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, minDate, isInv
         </Button>
       </PopoverTrigger>
       <Portal>
-        <PopoverContent w="280px" borderColor="gray.200" boxShadow="lg" borderRadius="lg" _focusVisible={{ outline: "none" }}>
+        {/* The portaled wrapper needs its own z-index to sit above modals. */}
+        <PopoverContent rootProps={{ zIndex: "popover" }} w="280px" borderColor="gray.200" boxShadow="lg" borderRadius="lg" _focusVisible={{ outline: "none" }}>
           <PopoverBody p={3}>
             <Flex justify="space-between" align="center" mb={2} pl={1}>
               <Text fontWeight={600} fontSize="sm">

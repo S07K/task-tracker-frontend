@@ -81,7 +81,8 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, isInvalid, ste
         </Button>
       </PopoverTrigger>
       <Portal>
-        <PopoverContent w="140px" borderColor="gray.200" boxShadow="lg" borderRadius="lg" _focusVisible={{ outline: "none" }}>
+        {/* The portaled wrapper needs its own z-index to sit above modals. */}
+        <PopoverContent rootProps={{ zIndex: "popover" }} w="140px" borderColor="gray.200" boxShadow="lg" borderRadius="lg" _focusVisible={{ outline: "none" }}>
           <PopoverBody p={1}>
             <Box ref={listRef} maxH="240px" overflowY="auto" position="relative" role="listbox">
               {options.map((option) => {
