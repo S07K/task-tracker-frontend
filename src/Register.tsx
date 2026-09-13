@@ -1,281 +1,144 @@
 import React, { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { GrFormNextLink } from "react-icons/gr";
 import {
-  Box,
   Button,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  Icon,
   Input,
-  VStack,
-  FormHelperText,
+  Link as ChakraLink,
+  Stack,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-axios.defaults.baseURL = import.meta.env.VITE_USER_API_URL;
+import { LuArrowRight, LuCheck } from "react-icons/lu";
+import { usersApi } from "./lib/api";
+import AuthLayout from "./components/AuthLayout";
+
+const validateEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [nameError, setNameError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
-  // const allState = {name, email, password, confirmPassword};
+  const [registeredMessage, setRegisteredMessage] = useState("");
+  const toast = useToast();
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const handleRegister = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const nextErrors: Record<string, string> = {};
+    if (!name) nextErrors.name = "Name is required";
+    if (!email) nextErrors.email = "Email is required";
+    else if (!validateEmail(email)) nextErrors.email = "Email is invalid";
+    if (!password) nextErrors.password = "Password is required";
+    if (!confirmPassword || password !== confirmPassword) nextErrors.confirmPassword = "Passwords do not match";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
 
-  const showError = ({ name, email, password, confirmPassword }: any) => {
-    if (!name) {
-      setNameError("Name is required");
-    } else {
-      setNameError("");
-    }
-
-    if (!email) {
-      setEmailError("Email is required");
-    } else if (!validateEmail(email)) {
-      setEmailError("Email is Invalid");
-    } else {
-      setEmailError("");
-    }
-
-    if (!password) {
-      setPasswordError("Password is required");
-    } else {
-      setPasswordError("");
-    }
-
-    if (!confirmPassword) {
-      setConfirmPasswordError("Reenter password");
-    } else {
-      setConfirmPasswordError("");
-    }
-
-    if (password != confirmPassword || !confirmPassword) {
-      setConfirmPasswordError("Passwords do not match");
-    } else {
-      setConfirmPasswordError("");
-    }
-  };
-
-  const handleRegister = async () => {
-    // Handle user registration logic here
     setIsLoading(true);
-    showError({ name, email, password, confirmPassword });
-    if (!name || !email || !password || !confirmPassword || !validateEmail(email) || (password != confirmPassword || !confirmPassword)) {
-      setIsLoading(false);
-    } else {
-      const res: any = await axios.post("/registerUser", {
-        name,
-        email,
-        password,
-      });
-      if(res.data && res.data.error) {
-        toast.error(res.data.error.message);
-        setIsLoading(false);
-        return;
-      } else if (res.data && res.data.message) {
-        toast.success(
-          res.data.message
-        );
-        setEmail("");
+    try {
+      const res: any = await usersApi.post("/registerUser", { name, email, password });
+      if (res.data?.error) {
+        toast({ status: "error", title: res.data.error.message });
+      } else if (res.data?.message) {
         setName("");
+        setEmail("");
         setPassword("");
         setConfirmPassword("");
-        setIsLoading(false);
-        setIsRegistered(true);
+        setRegisteredMessage(res.data.message);
       }
+    } catch (error: any) {
+      toast({
+        status: "error",
+        title: error?.response?.data?.error?.message || "Something went wrong, please try again later",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (registeredMessage) {
+    return (
+      <AuthLayout title="Check your inbox" subtitle="One more step before you get started">
+        <Flex direction="column" align="center" textAlign="center">
+          <Flex boxSize={12} borderRadius="full" bg="green.50" color="green.600" align="center" justify="center" mb={4}>
+            <Icon as={LuCheck} boxSize={6} />
+          </Flex>
+          <Text fontSize="sm" color="gray.600" mb={6}>
+            {registeredMessage}
+          </Text>
+          <Button as={Link} to="/login" variant="primary" w="full" rightIcon={<LuArrowRight />}>
+            Go to sign in
+          </Button>
+        </Flex>
+      </AuthLayout>
+    );
+  }
+
   return (
-    <Box
-      maxW="md"
-      mx="auto"
-      p={4}
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
+    <AuthLayout
+      title="Create your account"
+      subtitle="Free forever. No credit card required."
+      footer={
+        <>
+          Already have an account?{" "}
+          <ChakraLink as={Link} to="/login" fontWeight={600} color="gray.900">
+            Sign in
+          </ChakraLink>
+        </>
+      }
     >
-      <Toaster />
-      <VStack
-        spacing={4}
-        width={"100%"}
-        style={{
-          borderRadius: "12px",
-          boxShadow: "0px 0px 14px 2px #9595954a",
-        }}
-      >
-        <Box
-          width={"100%"}
-          backgroundColor={"#1E1E1E"}
-          style={{
-            color: "var(--lightPrimayBGColor)",
-            fontFamily: "Montserrat SemiBold",
-            fontSize: "24px",
-            borderRadius: "12px 12px 0 0",
-            padding: "20px",
-          }}
-        >
-          <Link to={"/"}>Task Tracker</Link>
-        </Box>
-        <Box
-          width={"100%"}
-          fontSize="xl"
-          fontWeight="bold"
-          style={{
-            padding: "0 20px 20px 20px",
-          }}
-        >
-          {isRegistered && (
-            <Box pb={4}>
-              <Box pt={4} _hover={{ color: "#66aae3" }} width={"fit-content"}>
-                <Link
-                  to="/login"
-                  style={{
-                    fontSize: "16px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
-                >
-                  Go to Login <GrFormNextLink />
-                </Link>
-              </Box>
-            </Box>
-          )}
-          {!isRegistered && (
-            <>
-              <Box fontSize="xl" fontWeight="bold" pt={4} pb={4}>
-                Register
-              </Box>
-              <FormControl id="name" pb={4}>
-                <FormLabel>Name</FormLabel>
-                <Input
-                  required
-                  type="name"
-                  value={name}
-                  onChange={(e) => {
-                    // showError({
-                    //   ...allState,
-                    //   name: e.target.value
-                    // });
-                    setName(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleRegister();
-                  }}
-                />
-                {nameError && (
-                  <FormHelperText style={{ color: "#e54e4e" }}>
-                    {nameError}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              <FormControl id="email" pb={4}>
-                <FormLabel>Email</FormLabel>
-                <Input
-                  required
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    // showError({
-                    //   ...allState,
-                    //   email: e.target.value
-                    // });
-                    setEmail(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleRegister();
-                  }}
-                />
-                {emailError && (
-                  <FormHelperText style={{ color: "#e54e4e" }}>
-                    {emailError}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              <FormControl id="password" pb={4}>
-                <FormLabel>Password</FormLabel>
-                <Input
-                  required
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    // showError({
-                    //   ...allState,
-                    //   password: e.target.value
-                    // });
-                    setPassword(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleRegister();
-                  }}
-                />
-                {passwordError && (
-                  <FormHelperText style={{ color: "#e54e4e" }}>
-                    {passwordError}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              <FormControl id="confirmPassword" pb={4}>
-                <FormLabel>Confirm Password</FormLabel>
-                <Input
-                  required
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    // showError({
-                    //   ...allState,
-                    //   confirmPassword: e.target.value
-                    // });
-                    setConfirmPassword(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleRegister();
-                  }}
-                />
-                {confirmPasswordError && (
-                  <FormHelperText style={{ color: "#e54e4e" }}>
-                    {confirmPasswordError}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              <Box pb={4}>
-                <Button
-                  colorScheme="blue"
-                  onClick={handleRegister}
-                  isLoading={isLoading}
-                >
-                  Register
-                </Button>
-                <Box pt={4} _hover={{ color: "#66aae3" }} width={"fit-content"}>
-                  <Link
-                    to="/login"
-                    style={{
-                      fontSize: "16px",
-                    }}
-                  >
-                    Already a user?
-                  </Link>
-                </Box>
-              </Box>
-            </>
-          )}
-        </Box>
-      </VStack>
-    </Box>
+      <form onSubmit={handleRegister} noValidate>
+        <Stack spacing={4}>
+          <FormControl isInvalid={Boolean(errors.name)}>
+            <FormLabel>Full name</FormLabel>
+            <Input placeholder="John Doe" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
+            <FormErrorMessage fontSize="xs">{errors.name}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={Boolean(errors.email)}>
+            <FormLabel>Email address</FormLabel>
+            <Input
+              type="email"
+              placeholder="john.doe@example.com"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <FormErrorMessage fontSize="xs">{errors.email}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={Boolean(errors.password)}>
+            <FormLabel>Password</FormLabel>
+            <Input
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <FormErrorMessage fontSize="xs">{errors.password}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={Boolean(errors.confirmPassword)}>
+            <FormLabel>Confirm password</FormLabel>
+            <Input
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <FormErrorMessage fontSize="xs">{errors.confirmPassword}</FormErrorMessage>
+          </FormControl>
+          <Button type="submit" variant="primary" w="full" isLoading={isLoading}>
+            Create account
+          </Button>
+        </Stack>
+      </form>
+    </AuthLayout>
   );
 };
 

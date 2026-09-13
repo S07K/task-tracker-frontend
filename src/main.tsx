@@ -1,24 +1,11 @@
 import React from "react";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { Provider } from "react-redux";
 import store from "./redux/store.ts";
 import AppRouter from "./AppRouter.tsx";
-
-const theme = extendTheme({
-  fonts: {
-    heading: "'Montserrat Regular', sans-serif",
-    body: "'Montserrat Regular', sans-serif",
-  },
-  styles: {
-    global: {
-      body: {
-        color: "#333",
-      },
-    },
-  },
-});
+import theme from "./theme.ts";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

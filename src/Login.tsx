@@ -1,19 +1,21 @@
 import {
-  Box,
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
-  VStack,
-  FormHelperText,
+  Link as ChakraLink,
+  Stack,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
-import { setToken, setUser } from "./redux/eventActions";
 import { useDispatch } from "react-redux";
-axios.defaults.baseURL = import.meta.env.VITE_USER_API_URL;
+import { setToken, setUser } from "./redux/eventActions";
+import { usersApi } from "./lib/api";
+import AuthLayout from "./components/AuthLayout";
+
+const validateEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -21,170 +23,93 @@ const Login: React.FC = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const dispatch = useDispatch();
+  const toast = useToast();
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const handleLogin = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const nextEmailError = !email ? "Email is required" : !validateEmail(email) ? "Email is invalid" : "";
+    const nextPasswordError = !password ? "Password is required" : "";
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+    if (nextEmailError || nextPasswordError) return;
 
-  const showError = ({ email, password }: any) => {
-
-    if (!email) {
-      setEmailError("Email is required");
-    } else if (!validateEmail(email)) {
-      setEmailError("Email is Invalid");
-    } else {
-      setEmailError("");
-    }
-
-    if (!password) {
-      setPasswordError("Password is required");
-    } else {
-      setPasswordError("");
-    }
-  };
-
-  const handleLogin = async () => {
-    // Add your login logic here
     setIsLoading(true);
-    showError({ email, password });
-    if (!email || !password || !validateEmail(email)) {
-      setIsLoading(false);
-    } else {
-      const res: any = await axios.post("/login", {
-        email,
-        password,
-      });
-      if (res.data && res.data?.token) {
+    try {
+      const res: any = await usersApi.post("/login", { email, password });
+      if (res.data?.token) {
         const { token, userId } = res.data;
         dispatch(setToken(token));
         dispatch(setUser(userId));
-        toast.success("Login Successful");
-        setIsLoading(false);
-      } else if (res.data && res.data.error) {
-        toast.error(res.data.error.message);
-        setIsLoading(false);
+        toast({ status: "success", title: "Welcome back!", duration: 2000 });
+      } else if (res.data?.error) {
+        toast({ status: "error", title: res.data.error.message });
       } else {
-        toast.error("Something went wrong, Please try again later");
-        setIsLoading(false);
+        toast({ status: "error", title: "Something went wrong, please try again later" });
       }
+    } catch (error: any) {
+      toast({
+        status: "error",
+        title: error?.response?.data?.error?.message || "Something went wrong, please try again later",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <Box
-        maxW="md"
-        mx="auto"
-        p={4}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Toaster />
-        <VStack
-          spacing={4}
-          width={"100%"}
-          style={{
-            borderRadius: "12px",
-            boxShadow: "0px 0px 14px 2px #9595954a",
-          }}
-        >
-          <Box
-            width={"100%"}
-            backgroundColor={"#1E1E1E"}
-            //   textAlign={"center"}
-            style={{
-              color: "var(--lightPrimayBGColor)",
-              fontFamily: "Montserrat SemiBold",
-              fontSize: "24px",
-              borderRadius: "12px 12px 0 0",
-              padding: "20px",
-            }}
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to manage your schedule"
+      footer={
+        <>
+          Don't have an account?{" "}
+          <ChakraLink as={Link} to="/register" fontWeight={600} color="gray.900">
+            Sign up
+          </ChakraLink>
+        </>
+      }
+    >
+      <form onSubmit={handleLogin} noValidate>
+        <Stack spacing={4}>
+          <FormControl isInvalid={Boolean(emailError)}>
+            <FormLabel>Email address</FormLabel>
+            <Input
+              type="email"
+              placeholder="john.doe@example.com"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <FormErrorMessage fontSize="xs">{emailError}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={Boolean(passwordError)}>
+            <FormLabel>Password</FormLabel>
+            <Input
+              type="password"
+              placeholder="••••••••"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <FormErrorMessage fontSize="xs">{passwordError}</FormErrorMessage>
+          </FormControl>
+          <ChakraLink
+            as={Link}
+            to="/forgot-password"
+            fontSize="sm"
+            color="gray.600"
+            alignSelf="flex-end"
+            mt={-1}
           >
-            <Link to={"/"}>Task Tracker</Link>
-          </Box>
-          <Box
-            width={"100%"}
-            fontSize="xl"
-            fontWeight="bold"
-            style={{
-              padding: "0 20px 20px 20px",
-            }}
-          >
-            <Box fontSize="xl" fontWeight="bold" pt={4} pb={4}>
-              Login
-            </Box>
-            <FormControl id="email" pb={4}>
-              <FormLabel>Email</FormLabel>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleLogin();
-                }}
-              />
-              {emailError && (
-                <FormHelperText style={{ color: "#e54e4e" }}>
-                  {emailError}
-                </FormHelperText>
-              )}
-            </FormControl>
-            <FormControl id="password" pb={4}>
-              <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleLogin();
-                }}
-              />
-              {passwordError && (
-                <FormHelperText style={{ color: "#e54e4e" }}>
-                  {passwordError}
-                </FormHelperText>
-              )}
-            </FormControl>
-            <Box pb={4}>
-              <Button
-                colorScheme="blue"
-                onClick={handleLogin}
-                isLoading={isLoading}
-              >
-                Login
-              </Button>
-              <Box mt={2} _hover={{ color: "#66aae3" }} width={"fit-content"}>
-                <Link
-                  to="/register"
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  Don't have an account?
-                </Link>
-              </Box>
-              <Box mt={2} _hover={{ color: "#66aae3" }} width={"fit-content"}>
-                <Link
-                  to="/forgot-password"
-                  style={{
-                    fontSize: "16px",
-                  }}
-                >
-                  Forgot Password?
-                </Link>
-              </Box>
-            </Box>
-          </Box>
-        </VStack>
-      </Box>
-    </>
+            Forgot password?
+          </ChakraLink>
+          <Button type="submit" variant="primary" w="full" isLoading={isLoading}>
+            Sign in
+          </Button>
+        </Stack>
+      </form>
+    </AuthLayout>
   );
 };
 
