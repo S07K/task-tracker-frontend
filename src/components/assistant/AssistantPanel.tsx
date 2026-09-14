@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -190,10 +190,20 @@ const AssistantPanel: React.FC<AssistantPanelProps> = ({ isOpen, onClose, assist
   const { messages, isSending, send, confirmDelete, cancelDelete, clear } = assistant;
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
 
+  // The drawer body mounts each time the panel opens, so jump to the latest
+  // message as soon as it's attached.
+  const attachBody = useCallback((node: HTMLDivElement | null) => {
+    bodyRef.current = node;
+    if (node) node.scrollTop = node.scrollHeight;
+  }, []);
+
+  // Follow new messages and the typing indicator while the panel is open. An
+  // instant jump doesn't depend on animation frames or reduced-motion settings.
   useEffect(() => {
-    if (isOpen) bottomRef.current?.scrollIntoView({ block: "end" });
+    const body = bodyRef.current;
+    if (isOpen && body) body.scrollTop = body.scrollHeight;
   }, [messages.length, isSending, isOpen]);
 
   const submit = () => {
@@ -234,7 +244,7 @@ const AssistantPanel: React.FC<AssistantPanelProps> = ({ isOpen, onClose, assist
         </Tooltip>
         <DrawerCloseButton top={4} />
 
-        <DrawerBody px={4} py={5} bg="white">
+        <DrawerBody ref={attachBody} px={4} py={5} bg="white">
           {messages.length === 0 ? (
             <Flex direction="column" align="center" textAlign="center" pt={10} px={2}>
               <Flex boxSize={12} borderRadius="full" bg="gray.100" align="center" justify="center" mb={4}>
@@ -281,7 +291,6 @@ const AssistantPanel: React.FC<AssistantPanelProps> = ({ isOpen, onClose, assist
               )}
             </Stack>
           )}
-          <div ref={bottomRef} />
         </DrawerBody>
 
         <DrawerFooter borderTop="1px solid" borderColor="gray.200" px={4} py={3} flexDirection="column" alignItems="stretch">
