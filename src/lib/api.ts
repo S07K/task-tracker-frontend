@@ -1,12 +1,23 @@
 import axios, { InternalAxiosRequestConfig } from "axios";
 
-// Separate clients so the users and events APIs never clobber each other's baseURL.
+// Backend base URL, e.g. http://localhost:5001. Each client adds its route.
+const API_URL = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
+
+if (!API_URL) {
+  console.error("VITE_API_URL is not set, so API requests won't reach the backend.");
+}
+
+// Separate clients so each route keeps its own baseURL.
 export const usersApi = axios.create({
-  baseURL: import.meta.env.VITE_USER_API_URL,
+  baseURL: `${API_URL}/users`,
 });
 
 export const eventsApi = axios.create({
-  baseURL: import.meta.env.VITE_EVENTS_API_URL,
+  baseURL: `${API_URL}/events`,
+});
+
+export const chatApi = axios.create({
+  baseURL: `${API_URL}/chat`,
 });
 
 const withAuth = (config: InternalAxiosRequestConfig) => {
@@ -16,10 +27,6 @@ const withAuth = (config: InternalAxiosRequestConfig) => {
   }
   return config;
 };
-
-export const chatApi = axios.create({
-  baseURL: import.meta.env.VITE_CHAT_API_URL,
-});
 
 eventsApi.interceptors.request.use(withAuth);
 usersApi.interceptors.request.use(withAuth);
