@@ -23,6 +23,7 @@ import { LuCheck, LuPencil, LuRotateCcw, LuSend, LuSparkles, LuTrash2 } from "re
 import { normalizeHex } from "../../lib/color";
 import { formatTime, parseLocal } from "../../lib/date";
 import { AssistantState, AssistantTask, ChatMessage } from "./useAssistant";
+import AssistantMarkdown from "./AssistantMarkdown";
 
 const MAX_INPUT_CHARS = 2000;
 
@@ -105,12 +106,12 @@ const MessageItem: React.FC<{
           borderRadius="2xl"
           borderTopLeftRadius="md"
           fontSize="sm"
-          whiteSpace="pre-wrap"
+          whiteSpace={message.isError ? "pre-wrap" : "normal"}
           wordBreak="break-word"
           bg={message.isError ? "red.50" : "gray.100"}
           color={message.isError ? "red.700" : "gray.900"}
         >
-          {message.content}
+          {message.isError ? message.content : <AssistantMarkdown content={message.content} />}
         </Box>
 
         {message.actions && (
