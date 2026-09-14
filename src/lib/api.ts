@@ -17,5 +17,10 @@ const withAuth = (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
+export const chatApi = axios.create({
+  baseURL: import.meta.env.VITE_CHAT_API_URL,
+});
+
 eventsApi.interceptors.request.use(withAuth);
 usersApi.interceptors.request.use(withAuth);
+chatApi.interceptors.request.use(withAuth);
