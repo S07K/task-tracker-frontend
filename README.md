@@ -27,7 +27,7 @@ Built with React, TypeScript, Vite, Chakra UI and FullCalendar, with a clean cal
 
 ```bash
 npm ci
-cp example.env .env.local   # then point the URLs at your backend
+cp example.env .env.local   # then set VITE_API_URL to your backend
 npm run dev
 ```
 
@@ -39,9 +39,7 @@ For email verification links to work locally, the backend's `APP_URL` should be 
 
 | Variable | Description |
 | --- | --- |
-| `VITE_USER_API_URL` | Users API base URL, e.g. `http://localhost:5001/users` |
-| `VITE_EVENTS_API_URL` | Events API base URL, e.g. `http://localhost:5001/events` |
-| `VITE_CHAT_API_URL` | AI assistant API base URL, e.g. `http://localhost:5001/chat` |
+| `VITE_API_URL` | Backend base URL, e.g. `http://localhost:5001`. The app adds the `/users`, `/events` and `/chat` routes |
 
 `.env` and `.env.local` are git-ignored. Vite embeds these values at **build time**, so they are public in the browser bundle and a rebuild is needed after changing them. Never put secrets in `VITE_*` variables.
 
@@ -73,7 +71,7 @@ Signed-out visitors to `/home` routes are redirected to `/login`. The login toke
 Deployed on Vercel from the `develop` branch.
 
 1. Set the Node.js version to **22.x** (Settings → Build and Deployment).
-2. Add `VITE_USER_API_URL`, `VITE_EVENTS_API_URL` and `VITE_CHAT_API_URL`, pointing at the deployed backend.
+2. Add `VITE_API_URL`, set to the deployed backend's base URL (no trailing route).
 3. Redeploy after changing environment variables, since they are baked in at build time.
 
 `vercel.json` rewrites every path to `/`, so client-side routes like `/home/calendar` load correctly on refresh.
