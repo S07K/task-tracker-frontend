@@ -13,6 +13,7 @@ Built with React, TypeScript, Vite, Chakra UI and FullCalendar, with a clean cal
   - Drag or resize a task to reschedule it (saved automatically)
 - **Task dialog**: title, all-day or timed, date and time pickers, and a color
 - **Account**: update your name and change your password
+- **Ask AI**: a chat assistant that answers questions about your schedule and can create, reschedule, edit and delete tasks. Deletes always show a Confirm button first, and the task list and calendar update as it works
 - Responsive layout with a sidebar on desktop and a bottom tab bar on mobile
 
 ## Getting started
@@ -40,6 +41,7 @@ For email verification links to work locally, the backend's `APP_URL` should be 
 | --- | --- |
 | `VITE_USER_API_URL` | Users API base URL, e.g. `http://localhost:5001/users` |
 | `VITE_EVENTS_API_URL` | Events API base URL, e.g. `http://localhost:5001/events` |
+| `VITE_CHAT_API_URL` | AI assistant API base URL, e.g. `http://localhost:5001/chat` |
 
 `.env` and `.env.local` are git-ignored. Vite embeds these values at **build time**, so they are public in the browser bundle and a rebuild is needed after changing them. Never put secrets in `VITE_*` variables.
 
@@ -71,7 +73,7 @@ Signed-out visitors to `/home` routes are redirected to `/login`. The login toke
 Deployed on Vercel from the `develop` branch.
 
 1. Set the Node.js version to **22.x** (Settings → Build and Deployment).
-2. Add `VITE_USER_API_URL` and `VITE_EVENTS_API_URL`, pointing at the deployed backend.
+2. Add `VITE_USER_API_URL`, `VITE_EVENTS_API_URL` and `VITE_CHAT_API_URL`, pointing at the deployed backend.
 3. Redeploy after changing environment variables, since they are baked in at build time.
 
 `vercel.json` rewrites every path to `/`, so client-side routes like `/home/calendar` load correctly on refresh.
@@ -93,12 +95,13 @@ src/
 │   ├── CalendarPage.tsx
 │   └── AccountPage.tsx
 ├── components/
+│   ├── assistant/            # Ask AI chat panel and chat state (useAssistant)
 │   ├── AuthLayout.tsx
 │   ├── Logo.tsx
 │   ├── dashboard/            # Sidebar, page header, task dialog, shared context
 │   └── ui/                   # DatePicker, TimePicker
 ├── lib/
-│   ├── api.ts                # Axios clients for the users and events APIs
+│   ├── api.ts                # Axios clients for the users, events and chat APIs
 │   ├── date.ts               # Local date/time helpers
 │   └── color.ts              # Task color palette helpers
 └── redux/                    # Auth token and user id state

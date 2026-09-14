@@ -2,9 +2,11 @@ import React from "react";
 import {
   Avatar,
   Box,
+  Button,
   Flex,
   HStack,
   Icon,
+  IconButton,
   Menu,
   MenuButton,
   MenuDivider,
@@ -16,7 +18,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { IconType } from "react-icons";
-import { LuCalendarDays, LuListChecks, LuLogOut, LuSettings, LuUser } from "react-icons/lu";
+import { LuCalendarDays, LuListChecks, LuLogOut, LuSettings, LuSparkles, LuUser } from "react-icons/lu";
 import Logo from "../Logo";
 import { logOut } from "../../redux/eventActions";
 import { Account } from "./context";
@@ -103,8 +105,13 @@ const UserMenu: React.FC<{ account: Account | null; compact?: boolean }> = ({ ac
   );
 };
 
+interface SidebarProps {
+  account: Account | null;
+  onOpenAssistant: () => void;
+}
+
 /** Desktop sidebar + mobile top bar / bottom tab bar. */
-const Sidebar: React.FC<{ account: Account | null }> = ({ account }) => (
+const Sidebar: React.FC<SidebarProps> = ({ account, onOpenAssistant }) => (
   <>
     <Box
       as="aside"
@@ -129,6 +136,14 @@ const Sidebar: React.FC<{ account: Account | null }> = ({ account }) => (
           <NavItem key={item.to} {...item} />
         ))}
       </VStack>
+      <Button
+        leftIcon={<LuSparkles />}
+        justifyContent="flex-start"
+        mb={2}
+        onClick={onOpenAssistant}
+      >
+        Ask AI
+      </Button>
       <UserMenu account={account} />
     </Box>
 
@@ -146,7 +161,10 @@ const Sidebar: React.FC<{ account: Account | null }> = ({ account }) => (
       borderColor="gray.200"
     >
       <Logo to="/home" size="sm" />
-      <UserMenu account={account} compact />
+      <HStack spacing={2}>
+        <IconButton aria-label="Ask AI" icon={<LuSparkles />} variant="minimal" size="sm" onClick={onOpenAssistant} />
+        <UserMenu account={account} compact />
+      </HStack>
     </Flex>
 
     <Flex
